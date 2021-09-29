@@ -6,7 +6,7 @@
    "spend_amount": "0.15",
    "revert_time": "10000",
    "gas_amount": "400000",
-   "gas_price": "30",
+   "gas_price": "40",
    "bsc_node": "https://bsc-dataseed.binance.org",
    "bscscan_api": ""
 }
