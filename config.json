@@ -3,7 +3,7 @@
    "wallet_privateKey": "",
    "pancake_router": "0x10ED43C718714eb63d5aA57B78B54704E256024E",
    "pancake_factory": "0xcA143Ce32Fe78f1f7019d7d551a6402fC5350c73",
-   "spend_amount": "0.15",
+   "spend_amount": "0.1",
    "revert_time": "10000",
    "gas_amount": "400000",
    "gas_price": "40",
