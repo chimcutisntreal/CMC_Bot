@@ -10,14 +10,42 @@ moralis_headers = {
     'X-API-Key': 'iAIsu5OZv8iDWJnd8nH5cjoT23Cnyvp5acS6JFmRqLFTOLXSbJt8gt5lskruicfm'
 }
 
-# abi = json.loads(
-#         '[{"constant":true,"inputs":[],"name":"name","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"spender","type":"address"},{"name":"tokens","type":"uint256"}],"name":"approve","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":false,"inputs":[{"name":"from","type":"address"},{"name":"to","type":"address"},{"name":"tokens","type":"uint256"}],"name":"transferFrom","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[],"name":"decimals","outputs":[{"name":"","type":"uint8"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"_totalSupply","outputs":[{"name":"","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"tokenOwner","type":"address"}],"name":"balanceOf","outputs":[{"name":"balance","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[],"name":"symbol","outputs":[{"name":"","type":"string"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"safeSub","outputs":[{"name":"c","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":false,"inputs":[{"name":"to","type":"address"},{"name":"tokens","type":"uint256"}],"name":"transfer","outputs":[{"name":"success","type":"bool"}],"payable":false,"stateMutability":"nonpayable","type":"function"},{"constant":true,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"safeDiv","outputs":[{"name":"c","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"safeMul","outputs":[{"name":"c","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"},{"constant":true,"inputs":[{"name":"tokenOwner","type":"address"},{"name":"spender","type":"address"}],"name":"allowance","outputs":[{"name":"remaining","type":"uint256"}],"payable":false,"stateMutability":"view","type":"function"},{"constant":true,"inputs":[{"name":"a","type":"uint256"},{"name":"b","type":"uint256"}],"name":"safeAdd","outputs":[{"name":"c","type":"uint256"}],"payable":false,"stateMutability":"pure","type":"function"},{"inputs":[],"payable":false,"stateMutability":"nonpayable","type":"constructor"},{"anonymous":false,"inputs":[{"indexed":true,"name":"from","type":"address"},{"indexed":true,"name":"to","type":"address"},{"indexed":false,"name":"tokens","type":"uint256"}],"name":"Transfer","type":"event"},{"anonymous":false,"inputs":[{"indexed":true,"name":"tokenOwner","type":"address"},{"indexed":true,"name":"spender","type":"address"},{"indexed":false,"name":"tokens","type":"uint256"}],"name":"Approval","type":"event"}]')
-# bsc_node = 'https://bsc-dataseed.binance.org'
-# web3 = Web3(Web3.HTTPProvider(bsc_node))
+test_data = [1.06,1.2,1.3,1.1,1.5,1.6,1,1.8,1.9,2.2,2.1,2.5,2.4,2.0,1.6,1.7,1.9,1.1,0.5,1.6]
 
-# token_contract = web3.eth.contract(address=token_to_buy, abi=abi)
+
+# def mornitoring_price_test():
+#     target = 2
+#     trailing_stop_loss = 30
+#     stop_loss = 10
+#     buy_price = 1.1
+#     max = 0
+#     sell_target = buy_price * target
+#     for result in test_data:
+#         print('price %f'%result)
+#         if result >= sell_target or max >= sell_target:
+#             if result >= max:
+#                 max = result
+#                 print('max = %f' %max)
+#                 print('-----------')
+#             elif result <= max - max * (trailing_stop_loss / 100):
+#                 print('Sold at %f'% result)
+#                 break
+#             else:
+#                 pass
+#         elif result <= buy_price - buy_price * (stop_loss / 100):
+#             print('Stop lost at %f'% result)
+#             break
+#         time.sleep(0.5)
+#
+# mornitoring_price_test()
 
 def mornitoring_price():
+    target = 2
+    trailing_stop_loss = 20
+    stop_loss = 5
+    buy_price = 0
+    max = 0
+    sell_target = buy_price * target
     while True:
         try:
             price_response = requests.request("GET", moralis_price_url, headers=moralis_headers)
@@ -29,12 +57,19 @@ def mornitoring_price():
                 if i['token_address'] == token_to_buy:
                     balance = int(i.get('balance', 0))
                     result = Web3.fromWei(balance, 'ether') * Web3.fromWei(price, 'ether')
-                    print(result)
+                    if result >= sell_target or max >= sell_target:
+                        if result >= max:
+                            max = result
+                        elif result <= max - max*(trailing_stop_loss/100):
+                            pass #sell
+                        else:
+                            pass
+                    elif result <= buy_price - buy_price*(stop_loss/100):
+                        pass #sell
                     break
         except Exception as error:
             print(error)
-        time.sleep(3)
-
+        time.sleep(5)
 
 def on_press(key):
     global running  # inform function to assign (`=`) to external/global `running` instead of creating local `running`
